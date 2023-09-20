@@ -1,4 +1,4 @@
-namespace GeneratorGrafiki
+namespace BackgroundGenerator
 {
     internal static class Program
     {

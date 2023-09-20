@@ -1,7 +1,7 @@
 using System.Drawing.Drawing2D;
 using System.Drawing;
 
-namespace GeneratorGrafiki
+namespace BackgroundGenerator
 {
     public partial class Main : Form
     {
