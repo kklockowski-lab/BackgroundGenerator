@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
             pb = new PictureBox();
             btnDraw = new Button();
             btnFont = new Button();
@@ -36,6 +37,7 @@
             btnEndCharColor = new Button();
             btnStartCharColor = new Button();
             panel = new Panel();
+            btnCopyBackground = new Button();
             btnSave = new Button();
             grbChar = new GroupBox();
             grBoxBackground = new GroupBox();
@@ -50,9 +52,19 @@
             tabControlMain = new TabControl();
             tabPageBackground = new TabPage();
             tabPageGradientBmp = new TabPage();
-            pbGradientOutput = new PictureBox();
+            splitContainerGradientMain = new SplitContainer();
+            listViewExpressions = new ListView();
+            splitContainerBitmaps = new SplitContainer();
             pbInputGradientBitmap = new PictureBox();
+            pbGradientOutput = new PictureBox();
             panelGradietnMenu = new Panel();
+            groupBox1 = new GroupBox();
+            btnGradientEndForBitmap = new Button();
+            btnGradientStartForBitmap = new Button();
+            chbRotateDirection = new CheckBox();
+            btnCopy = new Button();
+            btnPaste = new Button();
+            numDegreeRotate = new NumericUpDown();
             btnRotate = new Button();
             numHeightSize = new NumericUpDown();
             numWhidtSize = new NumericUpDown();
@@ -60,7 +72,7 @@
             btnPlusSize = new Button();
             btnAddGradient = new Button();
             btnLoadGradientBitmap = new Button();
-            numDegreeRotate = new NumericUpDown();
+            openFileDialog = new OpenFileDialog();
             ((System.ComponentModel.ISupportInitialize)pb).BeginInit();
             panel.SuspendLayout();
             grbChar.SuspendLayout();
@@ -70,12 +82,21 @@
             tabControlMain.SuspendLayout();
             tabPageBackground.SuspendLayout();
             tabPageGradientBmp.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)pbGradientOutput).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)splitContainerGradientMain).BeginInit();
+            splitContainerGradientMain.Panel1.SuspendLayout();
+            splitContainerGradientMain.Panel2.SuspendLayout();
+            splitContainerGradientMain.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)splitContainerBitmaps).BeginInit();
+            splitContainerBitmaps.Panel1.SuspendLayout();
+            splitContainerBitmaps.Panel2.SuspendLayout();
+            splitContainerBitmaps.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbInputGradientBitmap).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pbGradientOutput).BeginInit();
             panelGradietnMenu.SuspendLayout();
+            groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)numDegreeRotate).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numHeightSize).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numWhidtSize).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)numDegreeRotate).BeginInit();
             SuspendLayout();
             // 
             // pb
@@ -84,14 +105,14 @@
             pb.Dock = DockStyle.Fill;
             pb.Location = new Point(3, 3);
             pb.Name = "pb";
-            pb.Size = new Size(1262, 550);
+            pb.Size = new Size(1262, 519);
             pb.TabIndex = 0;
             pb.TabStop = false;
             // 
             // btnDraw
             // 
             btnDraw.Dock = DockStyle.Bottom;
-            btnDraw.Location = new Point(0, 173);
+            btnDraw.Location = new Point(0, 204);
             btnDraw.Name = "btnDraw";
             btnDraw.Size = new Size(1262, 34);
             btnDraw.TabIndex = 1;
@@ -151,21 +172,33 @@
             // 
             // panel
             // 
+            panel.Controls.Add(btnCopyBackground);
             panel.Controls.Add(btnSave);
             panel.Controls.Add(btnDraw);
             panel.Controls.Add(grbChar);
             panel.Controls.Add(grBoxBackground);
             panel.Controls.Add(grbFont);
             panel.Dock = DockStyle.Bottom;
-            panel.Location = new Point(3, 553);
+            panel.Location = new Point(3, 522);
             panel.Name = "panel";
-            panel.Size = new Size(1262, 207);
+            panel.Size = new Size(1262, 238);
             panel.TabIndex = 7;
+            // 
+            // btnCopyBackground
+            // 
+            btnCopyBackground.Dock = DockStyle.Bottom;
+            btnCopyBackground.Location = new Point(0, 140);
+            btnCopyBackground.Name = "btnCopyBackground";
+            btnCopyBackground.Size = new Size(1262, 33);
+            btnCopyBackground.TabIndex = 10;
+            btnCopyBackground.Text = "Kopiuj";
+            btnCopyBackground.UseVisualStyleBackColor = true;
+            btnCopyBackground.Click += btnCopyBackground_Click;
             // 
             // btnSave
             // 
             btnSave.Dock = DockStyle.Bottom;
-            btnSave.Location = new Point(0, 142);
+            btnSave.Location = new Point(0, 173);
             btnSave.Name = "btnSave";
             btnSave.Size = new Size(1262, 31);
             btnSave.TabIndex = 3;
@@ -281,8 +314,7 @@
             // 
             // tabPageGradientBmp
             // 
-            tabPageGradientBmp.Controls.Add(pbGradientOutput);
-            tabPageGradientBmp.Controls.Add(pbInputGradientBitmap);
+            tabPageGradientBmp.Controls.Add(splitContainerGradientMain);
             tabPageGradientBmp.Controls.Add(panelGradietnMenu);
             tabPageGradientBmp.Location = new Point(4, 24);
             tabPageGradientBmp.Name = "tabPageGradientBmp";
@@ -292,29 +324,79 @@
             tabPageGradientBmp.Text = "Dodaj gradient";
             tabPageGradientBmp.UseVisualStyleBackColor = true;
             // 
-            // pbGradientOutput
+            // splitContainerGradientMain
             // 
-            pbGradientOutput.BorderStyle = BorderStyle.FixedSingle;
-            pbGradientOutput.Location = new Point(552, 15);
-            pbGradientOutput.Name = "pbGradientOutput";
-            pbGradientOutput.Size = new Size(675, 466);
-            pbGradientOutput.SizeMode = PictureBoxSizeMode.CenterImage;
-            pbGradientOutput.TabIndex = 2;
-            pbGradientOutput.TabStop = false;
+            splitContainerGradientMain.Dock = DockStyle.Fill;
+            splitContainerGradientMain.Location = new Point(3, 3);
+            splitContainerGradientMain.Name = "splitContainerGradientMain";
+            // 
+            // splitContainerGradientMain.Panel1
+            // 
+            splitContainerGradientMain.Panel1.Controls.Add(listViewExpressions);
+            // 
+            // splitContainerGradientMain.Panel2
+            // 
+            splitContainerGradientMain.Panel2.Controls.Add(splitContainerBitmaps);
+            splitContainerGradientMain.Size = new Size(1262, 529);
+            splitContainerGradientMain.SplitterDistance = 173;
+            splitContainerGradientMain.TabIndex = 4;
+            // 
+            // listViewExpressions
+            // 
+            listViewExpressions.Dock = DockStyle.Fill;
+            listViewExpressions.Location = new Point(0, 0);
+            listViewExpressions.Name = "listViewExpressions";
+            listViewExpressions.Size = new Size(173, 529);
+            listViewExpressions.TabIndex = 0;
+            listViewExpressions.UseCompatibleStateImageBehavior = false;
+            listViewExpressions.SelectedIndexChanged += listViewExpressions_SelectedIndexChanged;
+            // 
+            // splitContainerBitmaps
+            // 
+            splitContainerBitmaps.Dock = DockStyle.Fill;
+            splitContainerBitmaps.Location = new Point(0, 0);
+            splitContainerBitmaps.Name = "splitContainerBitmaps";
+            // 
+            // splitContainerBitmaps.Panel1
+            // 
+            splitContainerBitmaps.Panel1.Controls.Add(pbInputGradientBitmap);
+            // 
+            // splitContainerBitmaps.Panel2
+            // 
+            splitContainerBitmaps.Panel2.Controls.Add(pbGradientOutput);
+            splitContainerBitmaps.Size = new Size(1085, 529);
+            splitContainerBitmaps.SplitterDistance = 453;
+            splitContainerBitmaps.TabIndex = 3;
             // 
             // pbInputGradientBitmap
             // 
             pbInputGradientBitmap.BorderStyle = BorderStyle.FixedSingle;
-            pbInputGradientBitmap.Location = new Point(21, 29);
+            pbInputGradientBitmap.Dock = DockStyle.Fill;
+            pbInputGradientBitmap.Location = new Point(0, 0);
             pbInputGradientBitmap.Name = "pbInputGradientBitmap";
-            pbInputGradientBitmap.Size = new Size(412, 264);
+            pbInputGradientBitmap.Size = new Size(453, 529);
             pbInputGradientBitmap.SizeMode = PictureBoxSizeMode.AutoSize;
             pbInputGradientBitmap.TabIndex = 1;
             pbInputGradientBitmap.TabStop = false;
             // 
+            // pbGradientOutput
+            // 
+            pbGradientOutput.BorderStyle = BorderStyle.FixedSingle;
+            pbGradientOutput.Dock = DockStyle.Fill;
+            pbGradientOutput.Location = new Point(0, 0);
+            pbGradientOutput.Name = "pbGradientOutput";
+            pbGradientOutput.Size = new Size(628, 529);
+            pbGradientOutput.SizeMode = PictureBoxSizeMode.CenterImage;
+            pbGradientOutput.TabIndex = 2;
+            pbGradientOutput.TabStop = false;
+            // 
             // panelGradietnMenu
             // 
             panelGradietnMenu.BorderStyle = BorderStyle.FixedSingle;
+            panelGradietnMenu.Controls.Add(groupBox1);
+            panelGradietnMenu.Controls.Add(chbRotateDirection);
+            panelGradietnMenu.Controls.Add(btnCopy);
+            panelGradietnMenu.Controls.Add(btnPaste);
             panelGradietnMenu.Controls.Add(numDegreeRotate);
             panelGradietnMenu.Controls.Add(btnRotate);
             panelGradietnMenu.Controls.Add(numHeightSize);
@@ -323,14 +405,84 @@
             panelGradietnMenu.Controls.Add(btnPlusSize);
             panelGradietnMenu.Controls.Add(btnAddGradient);
             panelGradietnMenu.Controls.Add(btnLoadGradientBitmap);
-            panelGradietnMenu.Location = new Point(21, 510);
+            panelGradietnMenu.Dock = DockStyle.Bottom;
+            panelGradietnMenu.Location = new Point(3, 532);
             panelGradietnMenu.Name = "panelGradietnMenu";
-            panelGradietnMenu.Size = new Size(792, 136);
+            panelGradietnMenu.Size = new Size(1262, 228);
             panelGradietnMenu.TabIndex = 0;
+            // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(btnGradientEndForBitmap);
+            groupBox1.Controls.Add(btnGradientStartForBitmap);
+            groupBox1.Location = new Point(176, 20);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(158, 106);
+            groupBox1.TabIndex = 11;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Gradient tła";
+            // 
+            // btnGradientEndForBitmap
+            // 
+            btnGradientEndForBitmap.Location = new Point(77, 22);
+            btnGradientEndForBitmap.Name = "btnGradientEndForBitmap";
+            btnGradientEndForBitmap.Size = new Size(75, 75);
+            btnGradientEndForBitmap.TabIndex = 4;
+            btnGradientEndForBitmap.Text = "Koniec";
+            btnGradientEndForBitmap.UseVisualStyleBackColor = true;
+            btnGradientEndForBitmap.Click += btnGradientEndForBitmap_Click;
+            // 
+            // btnGradientStartForBitmap
+            // 
+            btnGradientStartForBitmap.Location = new Point(2, 22);
+            btnGradientStartForBitmap.Name = "btnGradientStartForBitmap";
+            btnGradientStartForBitmap.Size = new Size(75, 75);
+            btnGradientStartForBitmap.TabIndex = 3;
+            btnGradientStartForBitmap.Text = "Start";
+            btnGradientStartForBitmap.UseVisualStyleBackColor = true;
+            btnGradientStartForBitmap.Click += btnGradientStartForBitmap_Click;
+            // 
+            // chbRotateDirection
+            // 
+            chbRotateDirection.AutoSize = true;
+            chbRotateDirection.Location = new Point(684, 39);
+            chbRotateDirection.Name = "chbRotateDirection";
+            chbRotateDirection.Size = new Size(107, 19);
+            chbRotateDirection.TabIndex = 10;
+            chbRotateDirection.Text = "Obróć w prawo";
+            chbRotateDirection.UseVisualStyleBackColor = true;
+            // 
+            // btnCopy
+            // 
+            btnCopy.Location = new Point(16, 75);
+            btnCopy.Name = "btnCopy";
+            btnCopy.Size = new Size(99, 58);
+            btnCopy.TabIndex = 9;
+            btnCopy.Text = "Kopiuj";
+            btnCopy.UseVisualStyleBackColor = true;
+            btnCopy.Click += btnCopy_Click;
+            // 
+            // btnPaste
+            // 
+            btnPaste.Location = new Point(16, 5);
+            btnPaste.Name = "btnPaste";
+            btnPaste.Size = new Size(99, 55);
+            btnPaste.TabIndex = 8;
+            btnPaste.Text = "Wklej";
+            btnPaste.UseVisualStyleBackColor = true;
+            btnPaste.Click += btnPaste_Click;
+            // 
+            // numDegreeRotate
+            // 
+            numDegreeRotate.Location = new Point(631, 37);
+            numDegreeRotate.Name = "numDegreeRotate";
+            numDegreeRotate.Size = new Size(41, 23);
+            numDegreeRotate.TabIndex = 7;
+            numDegreeRotate.Value = new decimal(new int[] { 15, 0, 0, 0 });
             // 
             // btnRotate
             // 
-            btnRotate.Location = new Point(407, 18);
+            btnRotate.Location = new Point(550, 35);
             btnRotate.Name = "btnRotate";
             btnRotate.Size = new Size(75, 23);
             btnRotate.TabIndex = 6;
@@ -340,7 +492,7 @@
             // 
             // numHeightSize
             // 
-            numHeightSize.Location = new Point(302, 59);
+            numHeightSize.Location = new Point(456, 78);
             numHeightSize.Name = "numHeightSize";
             numHeightSize.Size = new Size(41, 23);
             numHeightSize.TabIndex = 5;
@@ -348,7 +500,7 @@
             // 
             // numWhidtSize
             // 
-            numWhidtSize.Location = new Point(302, 18);
+            numWhidtSize.Location = new Point(456, 37);
             numWhidtSize.Name = "numWhidtSize";
             numWhidtSize.Size = new Size(41, 23);
             numWhidtSize.TabIndex = 4;
@@ -356,7 +508,7 @@
             // 
             // btnMinusSize
             // 
-            btnMinusSize.Location = new Point(221, 59);
+            btnMinusSize.Location = new Point(375, 78);
             btnMinusSize.Name = "btnMinusSize";
             btnMinusSize.Size = new Size(75, 23);
             btnMinusSize.TabIndex = 3;
@@ -366,7 +518,7 @@
             // 
             // btnPlusSize
             // 
-            btnPlusSize.Location = new Point(221, 18);
+            btnPlusSize.Location = new Point(375, 37);
             btnPlusSize.Name = "btnPlusSize";
             btnPlusSize.Size = new Size(75, 23);
             btnPlusSize.TabIndex = 2;
@@ -376,9 +528,9 @@
             // 
             // btnAddGradient
             // 
-            btnAddGradient.Location = new Point(18, 89);
+            btnAddGradient.Location = new Point(178, 132);
             btnAddGradient.Name = "btnAddGradient";
-            btnAddGradient.Size = new Size(113, 58);
+            btnAddGradient.Size = new Size(156, 58);
             btnAddGradient.TabIndex = 1;
             btnAddGradient.Text = "Dodaj gradient";
             btnAddGradient.UseVisualStyleBackColor = true;
@@ -386,21 +538,17 @@
             // 
             // btnLoadGradientBitmap
             // 
-            btnLoadGradientBitmap.Location = new Point(18, 18);
+            btnLoadGradientBitmap.Location = new Point(16, 145);
             btnLoadGradientBitmap.Name = "btnLoadGradientBitmap";
-            btnLoadGradientBitmap.Size = new Size(113, 52);
+            btnLoadGradientBitmap.Size = new Size(99, 52);
             btnLoadGradientBitmap.TabIndex = 0;
             btnLoadGradientBitmap.Text = "Otwórz obraz";
             btnLoadGradientBitmap.UseVisualStyleBackColor = true;
             btnLoadGradientBitmap.Click += btnLoadGradientBitmap_Click;
             // 
-            // numDegreeRotate
+            // openFileDialog
             // 
-            numDegreeRotate.Location = new Point(488, 20);
-            numDegreeRotate.Name = "numDegreeRotate";
-            numDegreeRotate.Size = new Size(41, 23);
-            numDegreeRotate.TabIndex = 7;
-            numDegreeRotate.Value = new decimal(new int[] { 15, 0, 0, 0 });
+            openFileDialog.FileName = "openFileDialog1";
             // 
             // Main
             // 
@@ -408,6 +556,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1276, 791);
             Controls.Add(tabControlMain);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "Main";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Generator tła :)";
@@ -422,13 +571,23 @@
             tabControlMain.ResumeLayout(false);
             tabPageBackground.ResumeLayout(false);
             tabPageGradientBmp.ResumeLayout(false);
-            tabPageGradientBmp.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)pbGradientOutput).EndInit();
+            splitContainerGradientMain.Panel1.ResumeLayout(false);
+            splitContainerGradientMain.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)splitContainerGradientMain).EndInit();
+            splitContainerGradientMain.ResumeLayout(false);
+            splitContainerBitmaps.Panel1.ResumeLayout(false);
+            splitContainerBitmaps.Panel1.PerformLayout();
+            splitContainerBitmaps.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)splitContainerBitmaps).EndInit();
+            splitContainerBitmaps.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pbInputGradientBitmap).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pbGradientOutput).EndInit();
             panelGradietnMenu.ResumeLayout(false);
+            panelGradietnMenu.PerformLayout();
+            groupBox1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)numDegreeRotate).EndInit();
             ((System.ComponentModel.ISupportInitialize)numHeightSize).EndInit();
             ((System.ComponentModel.ISupportInitialize)numWhidtSize).EndInit();
-            ((System.ComponentModel.ISupportInitialize)numDegreeRotate).EndInit();
             ResumeLayout(false);
         }
 
@@ -467,5 +626,16 @@
         private NumericUpDown numWhidtSize;
         private Button btnRotate;
         private NumericUpDown numDegreeRotate;
+        private Button btnPaste;
+        private Button btnCopy;
+        private CheckBox chbRotateDirection;
+        private GroupBox groupBox1;
+        private Button btnGradientEndForBitmap;
+        private Button btnGradientStartForBitmap;
+        private SplitContainer splitContainerBitmaps;
+        private OpenFileDialog openFileDialog;
+        private Button btnCopyBackground;
+        private SplitContainer splitContainerGradientMain;
+        private ListView listViewExpressions;
     }
 }

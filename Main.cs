@@ -1,6 +1,11 @@
 using System.Drawing.Drawing2D;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Collections;
+using System.Resources;
+using System.Reflection;
+using System;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace BackgroundGenerator
 {
@@ -12,6 +17,13 @@ namespace BackgroundGenerator
         Color endCharColor;
         Font font;
         Image image;
+
+
+        //Tab 2 - zmiana gradientu dla wczytywanych obrazków:
+        Image inputImage = null;
+        Bitmap outputBitmap = null;
+        Color startGriadentColorForChangeBitmap = Color.Red;
+        Color endGriadentColorForChangeBitmap = Color.Blue;
 
 
         public Main()
@@ -32,6 +44,9 @@ namespace BackgroundGenerator
             endCharColor = Properties.Settings.Default.EndBackColor;
             font = Properties.Settings.Default.Font;
 
+            startGriadentColorForChangeBitmap = Properties.Settings.Default.StartGradientColor;
+            endGriadentColorForChangeBitmap = Properties.Settings.Default.EndGradientColor;
+
             if (font == null) { font = new Font("Arial", 15); }
 
             comboBoxFont.Text = font.Name;
@@ -41,6 +56,14 @@ namespace BackgroundGenerator
             btnStartCharColor.BackColor = startCharColor;
             btnEndCharColor.BackColor = endCharColor;
 
+            btnGradientStartForBitmap.BackColor = startGriadentColorForChangeBitmap;
+            btnGradientEndForBitmap.BackColor = endGriadentColorForChangeBitmap;
+
+            chbDrawSings.Checked = Properties.Settings.Default.DrawChar;
+
+            btnDraw_Click(this, null);
+
+            LoadImagesIntoListView();
         }
 
         private void btnDraw_Click(object sender, EventArgs e)
@@ -150,6 +173,11 @@ namespace BackgroundGenerator
             Properties.Settings.Default.EndBackColor = endCharColor;
             Properties.Settings.Default.Font = font;
 
+            Properties.Settings.Default.StartGradientColor = startGriadentColorForChangeBitmap;
+            Properties.Settings.Default.EndGradientColor = endGriadentColorForChangeBitmap;
+
+            Properties.Settings.Default.DrawChar = chbDrawSings.Checked;
+
             Properties.Settings.Default.Save();
         }
 
@@ -167,24 +195,27 @@ namespace BackgroundGenerator
             font = new Font(comboBoxFont.Text, font.Size);
         }
 
-        Image inputImage = null;
-        Bitmap outputBitmap = null;
+
         private void btnLoadGradientBitmap_Click(object sender, EventArgs e)
         {
-            string inputFilePath = "input.png";
-            inputImage = Bitmap.FromFile(inputFilePath);
-            pbInputGradientBitmap.Image = inputImage;
-            outputBitmap = (Bitmap)inputImage;
-            pbGradientOutput.Image = outputBitmap;
+            openFileDialog.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp";
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                var image = Bitmap.FromFile(openFileDialog.FileName);
+                pbInputGradientBitmap.Image = image;
+                outputBitmap = (Bitmap)image;
+                pbGradientOutput.Image = image;
+            }
         }
 
         private void btnAddGradient_Click(object sender, EventArgs e)
         {
             if (outputBitmap is null) return;
             Bitmap bmp = new Bitmap(outputBitmap);
-            
-            Color gradientStart = Color.Red;
-            Color gradientEnd = Color.Blue;
+
+            Color gradientStart = startGriadentColorForChangeBitmap;
+            Color gradientEnd = endGriadentColorForChangeBitmap;
 
             // Przejœcie przez piksele obrazu
             for (int y = 0; y < bmp.Height; y++)
@@ -216,6 +247,7 @@ namespace BackgroundGenerator
 
             pbGradientOutput.Image = bmp;
             outputBitmap = bmp;
+
         }
 
         private void btnPlusSize_Click(object sender, EventArgs e)
@@ -263,7 +295,8 @@ namespace BackgroundGenerator
         private void btnRotate_Click(object sender, EventArgs e)
         {
             if (outputBitmap is null) return;
-            float angle = (float)numDegreeRotate.Value; // K¹t obrotu w stopniach
+            int direction = chbRotateDirection.Checked ? 1 : -1;
+            float angle = direction * (float)numDegreeRotate.Value; // K¹t obrotu w stopniach
 
             Size newSize = GetRotatedSize(outputBitmap.Size, angle);
             Bitmap rotatedBmp = new Bitmap(newSize.Width, newSize.Height);
@@ -299,6 +332,126 @@ namespace BackgroundGenerator
             int newHeight = (int)Math.Round(Math.Abs(width * sinTheta) + Math.Abs(height * cosTheta));
 
             return new Size(newWidth, newHeight);
+        }
+
+        private void btnPaste_Click(object sender, EventArgs e)
+        {
+            if (Clipboard.ContainsImage())
+            {
+                // Pobranie obrazu z schowka
+                Image image = Clipboard.GetImage();
+                if (image != null)
+                {
+                    // Przypisanie obrazu do PictureBox
+                    pbInputGradientBitmap.Image = image;
+                    outputBitmap = (Bitmap)image;
+                    pbGradientOutput.Image = image;
+                }
+            }
+        }
+
+        private void btnCopy_Click(object sender, EventArgs e)
+        {
+            if (pbGradientOutput.Image != null)
+            {
+                // Tworzenie bitmapy z obrazu PictureBox
+                Bitmap bmp = new Bitmap(pbGradientOutput.Image);
+
+                // Kopiowanie obrazu do schowka
+                Clipboard.SetImage(bmp);
+            }
+        }
+
+        private void btnGradientStartForBitmap_Click(object sender, EventArgs e)
+        {
+            if (colorDialog.ShowDialog() == DialogResult.OK)
+            {
+                startGriadentColorForChangeBitmap = colorDialog.Color;
+                btnGradientStartForBitmap.BackColor = startGriadentColorForChangeBitmap;
+            }
+        }
+
+        private void btnGradientEndForBitmap_Click(object sender, EventArgs e)
+        {
+            if (colorDialog.ShowDialog() == DialogResult.OK)
+            {
+                endGriadentColorForChangeBitmap = colorDialog.Color;
+                btnGradientEndForBitmap.BackColor = endGriadentColorForChangeBitmap;
+            }
+
+        }
+
+        private void btnCopyBackground_Click(object sender, EventArgs e)
+        {
+            if (pb.Image != null)
+            {
+                // Tworzenie bitmapy z obrazu PictureBox
+                Bitmap bmp = new Bitmap(pb.Image);
+
+                // Kopiowanie obrazu do schowka
+                Clipboard.SetImage(bmp);
+            }
+        }
+
+        private void LoadImagesIntoListView()
+        {
+            // Tworzenie ImageList
+            ImageList imageList = new ImageList();
+            imageList.ImageSize = new Size(120, 64); // Rozmiar ikon
+            var bitmapList = GetAllBitmaps();
+
+
+            foreach (var bitRes in bitmapList)
+            {
+                imageList.Images.Add((Image)bitRes.Bitmap);
+                ListViewItem item = new ListViewItem();
+                item.ImageIndex = bitRes.Id;
+                listViewExpressions.Items.Add(item);
+
+            }
+            listViewExpressions.LargeImageList = imageList;
+            listViewExpressions.View = View.LargeIcon;
+
+        }
+
+        private static List<BitmapResource> bitmaps = null;
+        public static List<BitmapResource> GetAllBitmaps()
+        {
+         bitmaps = new List<BitmapResource>();
+
+            // Pobierz typ klasy Expression
+            Type expressionType = typeof(Expression);
+
+            // Przeszukaj wszystkie w³aœciwoœci w klasie Expression
+            PropertyInfo[] properties = expressionType.GetProperties(BindingFlags.NonPublic | BindingFlags.Static);
+
+
+            int index = 0;
+            foreach (var property in properties)
+            {
+                // SprawdŸ, czy w³aœciwoœæ zwraca Bitmap
+                if (property.PropertyType == typeof(Bitmap))
+                {
+                    // Pobierz wartoœæ w³aœciwoœci
+                    Bitmap bitmap = property.GetValue(null) as Bitmap;
+                    if (bitmap != null)
+                    {
+                        bitmaps.Add(new BitmapResource { Bitmap = bitmap, Id = index++ });
+                    }
+                }
+            }
+
+            return bitmaps;
+        }
+
+        private void listViewExpressions_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (listViewExpressions.SelectedItems.Count > 0)
+            {
+                pbInputGradientBitmap.Image = bitmaps.Where(b => b.Id == listViewExpressions.SelectedIndices[0]).FirstOrDefault().Bitmap;
+                pbGradientOutput.Image = pbInputGradientBitmap.Image;
+                outputBitmap = (Bitmap)pbGradientOutput.Image;
+            }
         }
     }
 }
