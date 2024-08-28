@@ -1,5 +1,6 @@
 using System.Drawing.Drawing2D;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace BackgroundGenerator
 {
@@ -63,20 +64,23 @@ namespace BackgroundGenerator
                 List<string> chars = new List<string>() { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "\u03C0",
                                                        "x", ",", "y,", "z,", "e",  "\u0394,", "\u221A" };
 
-                int charSize = (int)font.Size;
-                for (int x = 0; x < pb.Width; x = x + charSize)
+                if (chbDrawSings.Checked)
                 {
-                    int diff = random.Next(charSize, 2 * charSize);
-                    for (int y = 0 - diff; y < pb.Height; y = y + charSize)
+                    int charSize = (int)font.Size;
+                    for (int x = 0; x < pb.Width; x = x + charSize)
                     {
-                        int d = random.Next(0, chars.Count);
-                        Rectangle rect = new Rectangle(x, y, 3 * charSize, 3 * charSize);
-                        LinearGradientBrush brush = new LinearGradientBrush(rect,
-                                                                            startCharColor,
-                                                                            endCharColor,
-                                                                            LinearGradientMode.Horizontal);
+                        int diff = random.Next(charSize, 2 * charSize);
+                        for (int y = 0 - diff; y < pb.Height; y = y + charSize)
+                        {
+                            int d = random.Next(0, chars.Count);
+                            Rectangle rect = new Rectangle(x, y, 3 * charSize, 3 * charSize);
+                            LinearGradientBrush brush = new LinearGradientBrush(rect,
+                                                                                startCharColor,
+                                                                                endCharColor,
+                                                                                LinearGradientMode.Horizontal);
 
-                        graphics.DrawString(chars[d], font, brush, rect);
+                            graphics.DrawString(chars[d], font, brush, rect);
+                        }
                     }
                 }
             }
@@ -161,6 +165,140 @@ namespace BackgroundGenerator
         private void comboBoxFont_TextChanged(object sender, EventArgs e)
         {
             font = new Font(comboBoxFont.Text, font.Size);
+        }
+
+        Image inputImage = null;
+        Bitmap outputBitmap = null;
+        private void btnLoadGradientBitmap_Click(object sender, EventArgs e)
+        {
+            string inputFilePath = "input.png";
+            inputImage = Bitmap.FromFile(inputFilePath);
+            pbInputGradientBitmap.Image = inputImage;
+            outputBitmap = (Bitmap)inputImage;
+            pbGradientOutput.Image = outputBitmap;
+        }
+
+        private void btnAddGradient_Click(object sender, EventArgs e)
+        {
+            if (outputBitmap is null) return;
+            Bitmap bmp = new Bitmap(outputBitmap);
+            
+            Color gradientStart = Color.Red;
+            Color gradientEnd = Color.Blue;
+
+            // Przejœcie przez piksele obrazu
+            for (int y = 0; y < bmp.Height; y++)
+            {
+                for (int x = 0; x < bmp.Width; x++)
+                {
+                    Color pixelColor = bmp.GetPixel(x, y);
+
+                    // Sprawdzenie czy piksel jest czarny
+                    if (pixelColor.R < 200 && pixelColor.G < 200 && pixelColor.B < 200)
+                    {
+                        // Obliczenie proporcji dla gradientu
+                        float ratio = (float)y / bmp.Height;
+
+                        // Mieszanie kolorów gradientu
+                        int r = (int)(gradientStart.R * (1 - ratio) + gradientEnd.R * ratio);
+                        int g = (int)(gradientStart.G * (1 - ratio) + gradientEnd.G * ratio);
+                        int b = (int)(gradientStart.B * (1 - ratio) + gradientEnd.B * ratio);
+
+                        Color newColor = Color.FromArgb(r, g, b);
+
+                        //Color newColor = Color.Red;
+
+                        // Ustawienie nowego koloru dla pikseli
+                        bmp.SetPixel(x, y, newColor);
+                    }
+                }
+            }
+
+            pbGradientOutput.Image = bmp;
+            outputBitmap = bmp;
+        }
+
+        private void btnPlusSize_Click(object sender, EventArgs e)
+        {
+            if (outputBitmap is null) return;
+
+            int newWidth = outputBitmap.Width + (int)numWhidtSize.Value; // Nowa szerokoœæ
+            int newHeight = outputBitmap.Height + (int)numHeightSize.Value; // Nowa wysokoœæ
+
+            Bitmap resizedBmp = new Bitmap(newWidth, newHeight);
+
+            using (Graphics g = Graphics.FromImage(resizedBmp))
+            {
+                g.Clear(Color.White);
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                g.DrawImage(outputBitmap, 0, 0, newWidth, newHeight);
+            }
+
+            // Wyœwietlenie zmniejszonego obrazu w PictureBox
+            pbGradientOutput.Image = resizedBmp;
+            outputBitmap = resizedBmp;
+        }
+
+        private void btnMinusSize_Click(object sender, EventArgs e)
+        {
+            if (outputBitmap is null) return;
+
+            int newWidth = outputBitmap.Width - (int)numWhidtSize.Value; // Nowa szerokoœæ
+            int newHeight = outputBitmap.Height - (int)numHeightSize.Value; // Nowa wysokoœæ
+
+            Bitmap resizedBmp = new Bitmap(newWidth, newHeight);
+
+            using (Graphics g = Graphics.FromImage(resizedBmp))
+            {
+                g.Clear(Color.White);
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                g.DrawImage(outputBitmap, 0, 0, newWidth, newHeight);
+            }
+
+            // Wyœwietlenie zmniejszonego obrazu w PictureBox
+            pbGradientOutput.Image = resizedBmp;
+            outputBitmap = resizedBmp;
+        }
+
+        private void btnRotate_Click(object sender, EventArgs e)
+        {
+            if (outputBitmap is null) return;
+            float angle = (float)numDegreeRotate.Value; // K¹t obrotu w stopniach
+
+            Size newSize = GetRotatedSize(outputBitmap.Size, angle);
+            Bitmap rotatedBmp = new Bitmap(newSize.Width, newSize.Height);
+
+            using (Graphics g = Graphics.FromImage(rotatedBmp))
+            {
+                g.Clear(Color.White);
+                // Ustawienie punktu, wokó³ którego ma byæ obracany obraz
+                g.TranslateTransform(newSize.Width / 2, newSize.Height / 2);
+                g.RotateTransform(angle);
+                g.TranslateTransform(-outputBitmap.Width / 2, -outputBitmap.Height / 2);
+
+                // Rysowanie obrazu na nowym bitmapie
+                g.DrawImage(outputBitmap, new Point(0, 0));
+            }
+
+
+            pbGradientOutput.Image = rotatedBmp;
+            outputBitmap = rotatedBmp;
+
+        }
+
+        private Size GetRotatedSize(Size originalSize, float angle)
+        {
+            double radians = angle * Math.PI / 180.0;
+            double cosTheta = Math.Cos(radians);
+            double sinTheta = Math.Sin(radians);
+
+            int width = originalSize.Width;
+            int height = originalSize.Height;
+
+            int newWidth = (int)Math.Round(Math.Abs(width * cosTheta) + Math.Abs(height * sinTheta));
+            int newHeight = (int)Math.Round(Math.Abs(width * sinTheta) + Math.Abs(height * cosTheta));
+
+            return new Size(newWidth, newHeight);
         }
     }
 }
